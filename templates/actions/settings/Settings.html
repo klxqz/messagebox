@@ -1,0 +1,102 @@
+<script type="text/javascript" src="{$wa_url}wa-content/js/ace/ace.js"></script>
+<script type="text/javascript" src="{$wa_url}wa-content/js/elrte/elrte.min.js"></script>
+<script type="text/javascript" src="{$wa_url}wa-content/js/elrte/elrte-wa.js"></script>
+{if $lang != 'en'}
+    <script type="text/javascript" src="{$wa_url}wa-content/js/elrte/i18n/elrte.{$lang}.js"></script>
+{/if}
+<script type="text/javascript" src="{$wa_url}wa-content/js/jquery-wa/wa.elrte.ace.js"></script>
+
+<link type="text/css" rel="stylesheet" href="{$wa_url}wa-content/js/redactor/redactor.css">
+<script src="{$wa_url}wa-content/js/redactor/redactor.min.js"></script>
+{if $lang!='en'}<script src="{$wa_url}wa-content/js/redactor/{$lang}.js"></script>{/if}
+<script src="{$wa_url}wa-content/js/jquery-wa/editor.js?v{$wa->version()}"></script>
+<style>
+    #messagebox-list td,#messagebox-list th{
+        padding: 5px 10px;
+    }
+</style>
+<h1>Всплывающие окна</h1>
+<div     class="fields form">
+    <form action="?module=plugins&id=messagebox&action=save" method="post" id="plugins-settings-form">
+        {$wa->csrf()}
+
+        <div class="field">
+            <div class="name">
+                Статус плагина
+            </div>
+            <div class="value">
+                <select name="shop_messagebox[status]">
+                    <option {if $settings.status == 1} selected="selected"{/if} value="1">Включен</option>
+                    <option {if $settings.status == 0} selected="selected"{/if} value="0">Выключен</option>
+                </select>
+            </div>
+        </div>
+
+
+        <div class="field">
+            <div class="name">
+                Подключать библиотеку fancybox
+            </div>
+            <div class="value">
+                <input type="hidden"  name="shop_messagebox[include_fancybox]" value="0" >
+                <input type="checkbox" {if $settings.include_fancybox}checked="checked"{/if}  name="shop_messagebox[include_fancybox]" value="1" > 
+            </div>
+        </div>
+
+
+        <div class="field">
+            <div class="name">
+                Всплывающие окна
+            </div>
+            <div class="value">
+
+                <table border="1" id="messagebox-list">
+                    <tr>
+                        <th>Название</th>
+                        <th>Ссылка</th>
+                        <th>Редактировать</th>
+                        <th>Удалить</th>
+                    </tr>
+                    {foreach $rows as $row}
+                        <tr data-messagebox-id="{$row.id}">
+                            <td class="messagebox-name">{$row.name|escape}</td>
+                            <td class="messagebox-url">{$row.url|escape}</td>
+                            <td>
+                                <a class="edit-but" href="#"><i class="icon16 edit"></i></a>
+                            </td>
+                            <td>
+                                <a class="delete-but" href="#"><i class="icon16 cross"></i></a>
+                            </td>
+                        </tr>
+                    {/foreach}
+                </table>
+
+
+                <a id="add-but" href="javascript:void(0);"><i class="icon16 add"></i>Добавить</a>
+            </div>
+        </div>
+
+
+
+        <div class="field">
+            <div class="value submit">
+                <input type="submit" class="button green" value="Сохранить">
+                <span id="plugins-settings-form-status" style="display:none">
+                    <i style="vertical-align:middle" class="icon16 yes"></i> [`Saved`]
+                </span>
+            </div>
+        </div>
+    </form>
+
+
+
+</div>
+<script type="text/javascript" src="{$wa_app_static_url}plugins/messagebox/js/messagebox.js?{$wa->version()}"></script>
+<script type="text/javascript">
+    var wa_app = '{$wa_url}';
+    var wa_url = '{$wa_url}';
+    var wa_lang = '{$lang}';
+    $(function() {
+        $.messagebox.init();
+    });
+</script>
