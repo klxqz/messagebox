@@ -7,15 +7,60 @@
                     <div class="fields form s-dialog-form">
                         <input type="hidden" id="messagebox-id" value="{if isset($messagebox.id)}{$messagebox.id}{/if}" name="messagebox[id]">
                         <div class="field-group">
+                            <h3>Основные настройки</h3>
                             <div class="field">
                                 <div class="name">Название</div>
                                 <div class="value">
                                     <input type="text" id="messagebox-name" value="{if isset($messagebox.name)}{$messagebox.name|escape}{/if}" class="large long" name="messagebox[name]">
                                 </div>
                             </div>
-                        </div>
-                        <div class="field-group" style="min-width: 600px;">
 
+                            <div class="field">
+                                <div class="name">Тип всплывающего окна</div>
+                                <div class="value">
+                                    <p>
+                                        <input {if !empty($messagebox.type) && $messagebox.type == 'link'}checked="checked"{/if} type="radio" name="messagebox[type]" value="link" /> Окно появляется по нажатию на ссылку, которую Вы размещаете на странице
+                                    </p>
+                                    <p>
+                                        <input {if !empty($messagebox.type) && $messagebox.type == 'url'}checked="checked"{/if} type="radio" name="messagebox[type]" value="url" /> Окно появляется автоматически при переходе на указанный адрес страницы - URL
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <div class="name">Url-адрес страницы, при переходе на который, появляется всплывающее окно</div>
+                                <div class="value">
+                                    <input type="text" value="{if isset($messagebox.url)}{$messagebox.url|escape}{/if}" class="large long" name="messagebox[url]">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="name">Окно появляется только при первом посищение страницы покупателем</div>
+                                <div class="value">
+                                    <input type="hidden" value="0" name="messagebox[first_visit]">
+                                    <input type="checkbox" value="1" {if !empty($messagebox.first_visit)}checked="checked"{/if} name="messagebox[first_visit]">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field-group">
+                            <h3>Параметры всплывающего окна</h3>
+                            {foreach $params as $param}
+                                <div class="field">
+                                    <div class="name">{$param.name|escape}{if $param.title} ({$param.title|escape}){/if}</div>
+                                    <div class="value">
+                                        {if is_bool($param.default)}
+                                            <input type="hidden" value="false" name="messagebox[params][{$param.name|escape}]">
+                                            <input {if $param.default}checked="checked"{/if} type="checkbox" value="true" name="messagebox[params][{$param.name|escape}]">
+                                        {else}
+                                            <input type="text" value="{$param.value|default:$param.default|escape}" class="short" name="messagebox[params][{$param.name|escape}]">
+                                        {/if}
+
+                                    </div>
+                                </div>
+                            {/foreach}
+                        </div>
+
+                        <div class="field-group" style="min-width: 600px;">
                             <div class="field description">
                                 <div class="name">
                                     <label for="description">
@@ -53,3 +98,19 @@
         </div>
     </form>
 </div>
+<script type="text/javascript">
+    $(function() {
+        $('input[name="messagebox[type]"]').change(function() {
+            if ($(this).val() == 'link') {
+                $('input[name="messagebox[url]"]').closest('.field').hide();
+                $('input[name="messagebox[first_visit]"]').closest('.field').hide();
+            } else {
+                $('input[name="messagebox[url]"]').closest('.field').show();
+                $('input[name="messagebox[first_visit]"]').closest('.field').show();
+            }
+        });
+        if (!$('input[name="messagebox[type]"]:checked').length) {
+            $('input[name="messagebox[type]"]:first').click();
+        }
+    });
+</script>

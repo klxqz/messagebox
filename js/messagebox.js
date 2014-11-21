@@ -47,17 +47,18 @@
                                 if (data.status == 'ok') {
                                     if (messagebox_id && $('#messagebox-list').find('tr[data-messagebox-id=' + messagebox_id + ']').length) {
                                         $('#messagebox-list').find('tr[data-messagebox-id=' + messagebox_id + '] .messagebox-name').html(data.data.messagebox.name);
-                                        $('#messagebox-list').find('tr[data-messagebox-id=' + messagebox_id + '] .messagebox-url').html(data.data.messagebox.url);
+                                        $('#messagebox-list').find('tr[data-messagebox-id=' + messagebox_id + '] .messagebox-helper').html(data.data.messagebox.helper);
                                     } else {
                                         $('<tr data-messagebox-id="' + data.data.messagebox.id + '">\
                                             <td class="messagebox-name">' + data.data.messagebox.name + '</td>\\n\
-                                            <td class="messagebox-url">' + data.data.messagebox.url + '</td>\
+                                            <td class="messagebox-helper">' + data.data.messagebox.helper + '</td>\
                                             <td><a class="edit-but" href="#"><i class="icon16 edit"></i></a></td>\
                                             <td><a class="delete-but" href="#"><i class="icon16 cross"></i></a></td>\
                                         </tr>').appendTo('#messagebox-list');
                                     }
                                     $('#dialog-response').text(data.data.message);
                                     $('#dialog-response').css('color','green');
+                                    $('#messagebox-dialog .cancel').click();
                                 }
                                 if (data.status == 'fail') {
                                     $('#dialog-response').text(data.errors);

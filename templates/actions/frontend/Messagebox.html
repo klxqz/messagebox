@@ -1,0 +1,26 @@
+{if $messagebox.type =='link'}
+    <a id="messagebox-{$messagebox.id}" class="messagebox" href="{$wa->getUrl('shop/frontend/',['plugin' => 'messagebox', 'id' => $messagebox.id])}">{$messagebox.name}</a>
+    <script type="text/javascript">
+        $(document).ready(function() {
+        $("#messagebox-{$messagebox.id}").fancybox({
+        type: 'ajax'{if !empty($params)},
+        {foreach $params as $param}
+            {$param.name}: {$param.value|default:$param.default}{if !$param@last}, {/if}
+        {/foreach}
+    {/if}
+        });
+        });</script>
+    {else}
+    <script type="text/javascript">
+                $(document).ready(function() {
+        $.fancybox.open({
+        href: '{$wa->getUrl('shop/frontend/',['plugin' => 'messagebox', 'id' => $messagebox.id])}',
+                type: 'ajax'{if !empty($params)},
+        {foreach $params as $param}
+            {$param.name}: {$param.value|default:$param.default}{if !$param@last}, {/if}
+        {/foreach}
+        {/if}
+        });
+        });
+        </script>
+        {/if}

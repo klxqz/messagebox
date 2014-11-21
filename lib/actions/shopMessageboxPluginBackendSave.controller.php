@@ -12,6 +12,8 @@ class shopMessageboxPluginBackendSaveController extends waJsonController {
             if (!$messagebox || !is_array($messagebox)) {
                 throw new Exception('Ошибка передачи данных');
             }
+
+            $messagebox['params'] = json_encode($messagebox['params']);
             $model = new shopMessageboxPluginModel();
 
             if (isset($messagebox['id']) && $messagebox['id']) {
@@ -20,10 +22,12 @@ class shopMessageboxPluginBackendSaveController extends waJsonController {
                 $lastInsertId = $model->insert($messagebox);
                 $messagebox['id'] = $lastInsertId;
             }
-            $url = wa()->getRouteUrl('/frontend', array('plugin' => 'messagebox', 'id' => $messagebox['id']));
-            $link = '<a class="fancybox fancybox.ajax" href="' . $url . '">' .
-                    htmlspecialchars($messagebox['name'], ENT_COMPAT, 'UTF-8') . '</a>';
-            $messagebox['url'] = htmlspecialchars($link, ENT_COMPAT, 'UTF-8');
+            if ($messagebox['type'] == 'link') {
+                $messagebox['helper'] = '{shopMessageboxPlugin::display(' . $messagebox['id'] . ')}';
+            } else {
+                $messagebox['helper'] = 'Работает автоматически при переходе на страницу: ' . htmlspecialchars($messagebox['url'], ENT_COMPAT, 'UTF-8');
+            }
+
             $messagebox['name'] = htmlspecialchars($messagebox['name'], ENT_COMPAT, 'UTF-8');
 
             $this->response['messagebox'] = $messagebox;

@@ -52,14 +52,14 @@
                 <table border="1" id="messagebox-list">
                     <tr>
                         <th>Название</th>
-                        <th>Ссылка</th>
+                        <th>Хелпер вывода</th>
                         <th>Редактировать</th>
                         <th>Удалить</th>
                     </tr>
                     {foreach $rows as $row}
                         <tr data-messagebox-id="{$row.id}">
                             <td class="messagebox-name">{$row.name|escape}</td>
-                            <td class="messagebox-url">{$row.url|escape}</td>
+                            <td class="messagebox-helper">{$row.helper|escape}</td>
                             <td>
                                 <a class="edit-but" href="#"><i class="icon16 edit"></i></a>
                             </td>
