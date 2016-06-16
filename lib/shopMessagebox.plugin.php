@@ -40,6 +40,25 @@ class shopMessageboxPlugin extends shopPlugin {
         }
     }
 
+    private function makeUrlPattern($url) {
+        $url = preg_replace('/https?:\/\//', '', $url);
+        $url = str_replace("*", ".*", $url);
+        $url = str_replace("/", "\/", $url);
+        return $url;
+    }
+
+    public function getMessageboxByUrl($url) {
+        $model = new shopMessageboxPluginModel();
+        $messageboxes = $model->select('*')->where("`url` != ''")->fetchAll();
+        foreach ($messageboxes as $messagebox) {
+            $pattern = $this->makeUrlPattern($messagebox['url']);
+            if (preg_match('/' . $pattern . '/', $url)) {
+                return $messagebox;
+            }
+        }
+        return false;
+    }
+
     public function frontendHead() {
         $app_settings_model = new waAppSettingsModel();
         if ($app_settings_model->get(self::$plugin_id, 'status')) {
@@ -49,13 +68,8 @@ class shopMessageboxPlugin extends shopPlugin {
             }
 
             $domain = wa()->getRouting()->getDomain(null, true);
-            $page = 'http://' . wa()->getRouting()->getDomainUrl($domain) . wa()->getConfig()->getRequestUrl(false, true);
-            $page_s = 'https://' . wa()->getRouting()->getDomainUrl($domain) . wa()->getConfig()->getRequestUrl(false, true);
-
-            $model = new shopMessageboxPluginModel();
-            $sql = "SELECT * FROM `shop_messagebox` WHERE `url` LIKE '" . $model->escape($page) . "' OR  `url` LIKE '" . $model->escape($page_s) . "'";
-            $messagebox = $model->query($sql)->fetch();
-
+            $url = wa()->getRouting()->getDomainUrl($domain) . wa()->getConfig()->getRequestUrl(false, true);
+            $messagebox = $this->getMessageboxByUrl($url);
 
             if ($messagebox) {
                 $hash = sha1($messagebox['id'] . $messagebox['url'] . $messagebox['type']);
