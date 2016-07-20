@@ -67,8 +67,7 @@ class shopMessageboxPlugin extends shopPlugin {
                 waSystem::getInstance()->getResponse()->addCss('plugins/messagebox/js/fancybox/jquery.fancybox.css', 'shop');
             }
 
-            $domain = wa()->getRouting()->getDomain(null, true);
-            $url = wa()->getRouting()->getDomainUrl($domain) . wa()->getConfig()->getRequestUrl(false, true);
+            $url = wa()->getConfig()->getHostUrl().wa()->getConfig()->getRequestUrl(false, true);
             $messagebox = $this->getMessageboxByUrl($url);
 
             if ($messagebox) {
