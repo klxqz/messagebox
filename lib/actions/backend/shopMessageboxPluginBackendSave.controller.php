@@ -14,6 +14,7 @@ class shopMessageboxPluginBackendSaveController extends waJsonController {
             }
 
             $messagebox['params'] = json_encode($messagebox['params']);
+            $messagebox['categories'] = json_encode($messagebox['categories']);
             $model = new shopMessageboxPluginModel();
 
             if (isset($messagebox['id']) && $messagebox['id']) {
@@ -24,8 +25,12 @@ class shopMessageboxPluginBackendSaveController extends waJsonController {
             }
             if ($messagebox['type'] == 'link') {
                 $messagebox['helper'] = '{shopMessageboxPlugin::display(' . $messagebox['id'] . ')}';
-            } else {
-                $messagebox['helper'] = 'Работает автоматически при переходе на страницу: ' . htmlspecialchars($messagebox['url'], ENT_COMPAT, 'UTF-8');
+            } elseif ($messagebox['type'] == 'url') {
+                $messagebox['helper'] = 'Работает автоматически при переходе на страницу: ' . $messagebox['url'];
+            } elseif ($messagebox['type'] == 'product') {
+                $messagebox['helper'] = 'Работает автоматически при переходе на страницу товара';
+            } elseif ($messagebox['type'] == 'category') {
+                $messagebox['helper'] = 'Работает автоматически при переходе на страницу категории';
             }
 
             $messagebox['name'] = htmlspecialchars($messagebox['name'], ENT_COMPAT, 'UTF-8');

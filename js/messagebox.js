@@ -1,39 +1,55 @@
-(function($) {
+(function ($) {
     $.messagebox = {
         options: {},
-        init: function(options) {
+        init: function (options) {
             this.options = options;
             this.initButtons();
             return this;
         },
-        initButtons: function() {
-            $('#add-but').click(function() {
+        initButtons: function () {
+            $('#ibutton-status').iButton({
+                labelOn: "Вкл", labelOff: "Выкл"
+            }).change(function () {
+                var self = $(this);
+                var enabled = self.is(':checked');
+                if (enabled) {
+                    self.closest('.field-group').siblings().show(200);
+                } else {
+                    self.closest('.field-group').siblings().hide(200);
+                }
+                var f = $("#plugins-settings-form");
+                $.post(f.attr('action'), f.serialize());
+            });
+            $('.s-ibutton-checkbox').iButton({
+                labelOn: "", labelOff: "", className: 'mini'
+            });
+            $('#add-but').click(function () {
                 $.messagebox.messageDialog();
                 return false;
             });
-            $('#messagebox-list').on('click', '.edit-but', function() {
+            $('#messagebox-list').on('click', '.edit-but', function () {
                 var messagebox_id = $(this).closest('tr').data('messagebox-id');
                 $.messagebox.messageDialog(messagebox_id);
                 return false;
             });
-            $('#messagebox-list').on('click', '.delete-but', function() {
+            $('#messagebox-list').on('click', '.delete-but', function () {
                 var messagebox_id = $(this).closest('tr').data('messagebox-id');
                 $(this).after('<i class="icon16 loading"></i>');
                 $.messagebox.deleteMessagebox(messagebox_id);
                 return false;
             });
         },
-        messageDialog: function(messagebox_id) {
+        messageDialog: function (messagebox_id) {
             messagebox_id = messagebox_id || null;
-            var showDialog = function() {
+            var showDialog = function () {
                 $('#messagebox-dialog').waDialog({
                     disableButtonsOnSubmit: true,
-                    onLoad: function() {
+                    onLoad: function () {
                         if ($('#messagebox-description-content').length) {
                             $.messagebox.initMessageboxWysiwyg($(this));
                         }
                     },
-                    onSubmit: function(d) {
+                    onSubmit: function (d) {
                         var form = $(this);
                         if ($('#messagebox-description-content').length) {
                             $('#messagebox-description-content').waEditor('sync');
@@ -43,7 +59,7 @@
                             url: form.attr('action'),
                             dataType: 'json',
                             data: form.serialize(),
-                            success: function(data, textStatus, jqXHR) {
+                            success: function (data, textStatus, jqXHR) {
                                 if (data.status == 'ok') {
                                     if (messagebox_id && $('#messagebox-list').find('tr[data-messagebox-id=' + messagebox_id + ']').length) {
                                         $('#messagebox-list').find('tr[data-messagebox-id=' + messagebox_id + '] .messagebox-name').html(data.data.messagebox.name);
@@ -57,12 +73,12 @@
                                         </tr>').appendTo('#messagebox-list');
                                     }
                                     $('#dialog-response').text(data.data.message);
-                                    $('#dialog-response').css('color','green');
+                                    $('#dialog-response').css('color', 'green');
                                     $('#messagebox-dialog .cancel').click();
                                 }
                                 if (data.status == 'fail') {
                                     $('#dialog-response').text(data.errors);
-                                    $('#dialog-response').css('color','red');
+                                    $('#dialog-response').css('color', 'red');
                                 }
 
                             }
@@ -86,7 +102,7 @@
 
 
         },
-        deleteMessagebox: function(messagebox_id) {
+        deleteMessagebox: function (messagebox_id) {
             $.ajax({
                 type: 'POST',
                 url: '?plugin=messagebox&action=delete',
@@ -94,7 +110,7 @@
                 data: {
                     messagebox_id: messagebox_id
                 },
-                success: function(data, textStatus, jqXHR) {
+                success: function (data, textStatus, jqXHR) {
                     if (data.status == 'ok') {
                         $('#messagebox-list').find('tr[data-messagebox-id=' + messagebox_id + ']').remove();
                     }
@@ -102,7 +118,7 @@
                 }
             });
         },
-        initMessageboxWysiwyg: function(d) {
+        initMessageboxWysiwyg: function (d) {
             var field = d.find('.field.description');
             field.find('i').hide();
             field.find('.s-editor-core-wrapper').show();

@@ -5,13 +5,13 @@
             <div class="dialog-content">
                 <div class="dialog-content-indent">
                     <div class="fields form s-dialog-form">
-                        <input type="hidden" id="messagebox-id" value="{if isset($messagebox.id)}{$messagebox.id}{/if}" name="messagebox[id]">
+                        <input type="hidden" id="messagebox-id" value="{$messagebox.id|default:''}" name="messagebox[id]">
                         <div class="field-group">
                             <h3>Основные настройки</h3>
                             <div class="field">
                                 <div class="name">Название</div>
                                 <div class="value">
-                                    <input type="text" id="messagebox-name" value="{if isset($messagebox.name)}{$messagebox.name|escape}{/if}" class="large long" name="messagebox[name]">
+                                    <input type="text" id="messagebox-name" value="{$messagebox.name|default:''|escape}" class="large long" name="messagebox[name]">
                                 </div>
                             </div>
 
@@ -19,20 +19,26 @@
                                 <div class="name">Тип всплывающего окна</div>
                                 <div class="value">
                                     <p>
-                                        <input {if !empty($messagebox.type) && $messagebox.type == 'link'}checked="checked"{/if} type="radio" name="messagebox[type]" value="link" /> Окно появляется по нажатию на ссылку, которую Вы размещаете на странице
+                                        <input {if $messagebox.type|default:'link' == 'link'}checked="checked"{/if} type="radio" name="messagebox[type]" value="link" /> Окно появляется по нажатию на ссылку, которую Вы размещаете на странице
                                     </p>
                                     <p>
-                                        <input {if !empty($messagebox.type) && $messagebox.type == 'url'}checked="checked"{/if} type="radio" name="messagebox[type]" value="url" /> Окно появляется автоматически при переходе на указанный адрес страницы - URL
+                                        <input {if $messagebox.type|default:'link' == 'url'}checked="checked"{/if} type="radio" name="messagebox[type]" value="url" /> Окно появляется автоматически при переходе на указанный адрес страницы - URL
+                                    </p>
+                                    <p>
+                                        <input {if $messagebox.type|default:'link' == 'product'}checked="checked"{/if} type="radio" name="messagebox[type]" value="product" /> Окно появляется автоматически при переходе на страницу товара
+                                    </p>
+                                    <p>
+                                        <input {if $messagebox.type|default:'link' == 'category'}checked="checked"{/if} type="radio" name="messagebox[type]" value="category" /> Окно появляется автоматически при переходе на страницу категории товаров
                                     </p>
                                 </div>
                             </div>
 
-                            <div class="field">
+                            <div class="field"{if $messagebox.type|default:'link' != 'url'} style="display: none"{/if}>
                                 <div class="name">Url-адрес страницы, при переходе на который, появляется всплывающее окно</div>
                                 <div class="value">
-                                    <input type="text" value="{if isset($messagebox.url)}{$messagebox.url|escape}{/if}" class="large long" name="messagebox[url]">
+                                    <input type="text" value="{$messagebox.url|default:''|escape}" class="large long" name="messagebox[url]">
                                 </div>
-                            </div>
+                            </div>                         
                             <div class="field">
                                 <div class="name">Окно появляется только при первом посищение страницы покупателем</div>
                                 <div class="value">
@@ -40,6 +46,29 @@
                                     <input type="checkbox" value="1" {if !empty($messagebox.first_visit)}checked="checked"{/if} name="messagebox[first_visit]">
                                 </div>
                             </div>
+
+                            <div class="field">
+                                <div class="name">Кратность появления</div>
+                                <div class="value">
+                                    <input type="text" value="{$messagebox.multiplicity|default:1|escape}"  name="messagebox[multiplicity]">
+                                    <p class="hint">Окно появляется с заданной кратностью. Например, раз в 5 раз.</p>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <div class="name">Группа пользователей</div>
+                                <div class="value">
+                                    <ul class="menu-v">
+                                        {foreach $categories as $category}
+                                            <li>
+                                                <input type="checkbox" name="messagebox[categories][]" value="{$category.id}"{if in_array($category.id, $messagebox.categories|default:[])} checked="checked"{/if}/> {$category.name}
+                                            </li>
+                                        {/foreach}
+                                    </ul>
+                                </div>
+                            </div>
+
+
                         </div>
 
                         <div class="field-group">
@@ -54,7 +83,6 @@
                                         {else}
                                             <input type="text" value="{$param.value|default:$param.default|escape}" class="short" name="messagebox[params][{$param.name|escape}]">
                                         {/if}
-
                                     </div>
                                 </div>
                             {/foreach}
@@ -75,7 +103,7 @@
                                             <li><a class="html" href="#">HTML</a></li>
                                         </ul>
                                         <div>
-                                            <textarea style="display:none" id="messagebox-description-content" name="messagebox[description]">{if isset($messagebox.description)}{$messagebox.description|escape}{/if}</textarea>
+                                            <textarea style="display:none" id="messagebox-description-content" name="messagebox[description]">{$messagebox.description|default:''|escape}</textarea>
                                             <div class="ace">
                                                 <div id="wa-ace-editor-container"></div>
                                             </div>
@@ -99,18 +127,38 @@
     </form>
 </div>
 <script type="text/javascript">
-    $(function() {
-        $('input[name="messagebox[type]"]').change(function() {
+    $(function () {
+        $('input[name="messagebox[type]"]').change(function () {
             if ($(this).val() == 'link') {
                 $('input[name="messagebox[url]"]').closest('.field').hide();
                 $('input[name="messagebox[first_visit]"]').closest('.field').hide();
-            } else {
+                $('input[name="messagebox[multiplicity]"]').closest('.field').hide();
+            } else if ($(this).val() == 'url') {
                 $('input[name="messagebox[url]"]').closest('.field').show();
                 $('input[name="messagebox[first_visit]"]').closest('.field').show();
+                $('input[name="messagebox[multiplicity]"]').closest('.field').show();
+            } else if ($(this).val() == 'product' || $(this).val() == 'category') {
+                $('input[name="messagebox[first_visit]"]').closest('.field').show();
+                $('input[name="messagebox[multiplicity]"]').closest('.field').show();
+                $('input[name="messagebox[url]"]').closest('.field').hide();
             }
         });
-        if (!$('input[name="messagebox[type]"]:checked').length) {
-            $('input[name="messagebox[type]"]:first').click();
-        }
+        $('input[name="messagebox[type]"]:checked').change();
+
+        $('input[name="messagebox[with_params]"]').change(function () {
+            if ($(this).is(':checked')) {
+                $('input[name="messagebox[get_params]"]').closest('.field').show();
+            } else {
+                $('input[name="messagebox[get_params]"]').closest('.field').hide();
+            }
+        }).change();
+
+        $('input[name="messagebox[first_visit]"]').change(function () {
+            if ($(this).is(':checked')) {
+                $('input[name="messagebox[multiplicity]"]').attr('disabled', true);
+            } else {
+                $('input[name="messagebox[multiplicity]"]').removeAttr('disabled');
+            }
+        }).change();
     });
 </script>

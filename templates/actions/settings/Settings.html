@@ -1,55 +1,66 @@
-<script type="text/javascript" src="{$wa_url}wa-content/js/ace/ace.js"></script>
-<script type="text/javascript" src="{$wa_url}wa-content/js/elrte/elrte.min.js"></script>
-<script type="text/javascript" src="{$wa_url}wa-content/js/elrte/elrte-wa.js"></script>
-{if $lang != 'en'}
-    <script type="text/javascript" src="{$wa_url}wa-content/js/elrte/i18n/elrte.{$lang}.js"></script>
-{/if}
-<script type="text/javascript" src="{$wa_url}wa-content/js/jquery-wa/wa.elrte.ace.js"></script>
-<link type="text/css" rel="stylesheet" href="{$wa_url}wa-content/js/redactor/redactor.css">
-<script src="{$wa_url}wa-content/js/redactor/redactor.min.js"></script>
-{if $lang!='en'}<script src="{$wa_url}wa-content/js/redactor/{$lang}.js"></script>{/if}
-<script src="{$wa_url}wa-content/js/jquery-wa/editor.js?v{$wa->version()}"></script>
+<link type="text/css" rel="stylesheet" href="{$wa_url}wa-content/js/redactor/2/redactor.css?v{$wa->version(true)}">
+<script src="{$wa_url}wa-content/js/redactor/2/redactor.min.js?v{$wa->version(true)}"></script>
+{if $lang!='en'}<script src="{$wa_url}wa-content/js/redactor/2/{$lang}.js?v{$wa->version(true)}"></script>{/if}
+<script src="{$wa_url}wa-content/js/jquery-wa/editor2.js?v{$wa->version(true)}"></script>
 <style>
+    .plugin-menu{
+        float: right;
+        list-style: none;
+    }
+    .plugin-menu li{
+        float: left;
+        margin-left: 10px;
+    }
+    .plugin-menu li a{
+        text-decoration: underline;
+    }
     #messagebox-list td,#messagebox-list th{
         padding: 5px 10px;
     }
 </style>
-<h1>Всплывающие окна</h1>
-<div     class="fields form">
+{$settings = $plugin->getSettings()}
+<h1>{$plugin->getName()}</h1>
+<ul class="plugin-menu">
+    <li><a href="http://support.wa-plugins.ru/"><i class="icon16 ss pt hammer"></i>Поддержка</a></li>
+</ul>
+<div class="fields form">
     <form action="?module=plugins&id=messagebox&action=save" method="post" id="plugins-settings-form">
         {$wa->csrf()}
 
-        <div class="field">
-            <div class="name">
-                Статус плагина
-            </div>
-            <div class="value">
-                <select name="shop_messagebox[status]">
-                    <option {if $settings.status == 1} selected="selected"{/if} value="1">Включен</option>
-                    <option {if $settings.status == 0} selected="selected"{/if} value="0">Выключен</option>
-                </select>
-            </div>
-        </div>
-
-
-        <div class="field">
-            <div class="name">
-                Подключать библиотеку fancybox
-            </div>
-            <div class="value">
-                <input type="hidden"  name="shop_messagebox[include_fancybox]" value="0" >
-                <input type="checkbox" {if $settings.include_fancybox}checked="checked"{/if}  name="shop_messagebox[include_fancybox]" value="1" > 
+        <div class="field-group">
+            <div class="field">
+                <div class="name">
+                    Статус плагина
+                </div>
+                <div class="value no-shift s-ibutton-checkbox">
+                    <input type="hidden" name="shop_messagebox[status]" value="0">
+                    <input type="checkbox" id="ibutton-status" name="shop_messagebox[status]" value="1"{if $settings.status} checked{/if}>
+                </div>
             </div>
         </div>
 
 
-        <div class="field">
+        <div class="field-group"{if !$settings.status|default:0} style="display:none"{/if}>
+            <div class="field">
+                <div class="name">
+                    Подключать библиотеку fancybox
+                </div>
+                <div class="value no-shift s-ibutton-checkbox">
+                    <input type="hidden" name="shop_messagebox[include_fancybox]" value="0">
+                    <input type="checkbox" class="ibutton" name="shop_messagebox[include_fancybox]" value="1"{if $settings.include_fancybox|default:1}checked="checked"{/if}>
+                    <p class="hint">Если в теме дизайна уже используется библиотека fancybox, то выключите данную опцию</p>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="field"{if !$settings.status|default:0} style="display:none"{/if}>
             <div class="name">
                 Всплывающие окна
             </div>
             <div class="value">
 
-                <table border="1" id="messagebox-list">
+                <table class="table zebra" border="1" id="messagebox-list">
                     <tr>
                         <th>Название</th>
                         <th>Хелпер вывода</th>
@@ -77,7 +88,7 @@
 
 
 
-        <div class="field">
+        <div class="field"{if !$settings.status|default:0} style="display:none"{/if}>
             <div class="value submit">
                 <input type="submit" class="button green" value="Сохранить">
                 <span id="plugins-settings-form-status" style="display:none">
@@ -95,7 +106,7 @@
     var wa_app = '{$wa_url}';
     var wa_url = '{$wa_url}';
     var wa_lang = '{$lang}';
-    $(function() {
+    $(function () {
         $.messagebox.init();
     });
 </script>

@@ -21,6 +21,7 @@ class shopMessageboxPluginBackendDialogAction extends waViewAction {
             $model = new shopMessageboxPluginModel();
             $messagebox = $model->getById($messagebox_id);
             $messagebox['params'] = json_decode($messagebox['params'], true);
+            $messagebox['categories'] = json_decode($messagebox['categories'], true);
             if (is_array($messagebox['params'])) {
                 foreach ($messagebox['params'] as $name => $value) {
                     if (isset($params[$name])) {
@@ -31,6 +32,18 @@ class shopMessageboxPluginBackendDialogAction extends waViewAction {
             $this->view->assign('messagebox', $messagebox);
         }
         $this->view->assign('params', $params);
+
+        $ccm = new waContactCategoryModel();
+        $categories = array(
+            array('id' => 0, 'name' => 'Все покупатели')
+        );
+        foreach ($ccm->getAll() as $c) {
+            if ($c['app_id'] == 'shop') {
+                $categories[$c['id']] = $c;
+            }
+        }
+        
+        $this->view->assign('categories', $categories);
     }
 
 }
