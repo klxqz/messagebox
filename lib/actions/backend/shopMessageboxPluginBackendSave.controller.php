@@ -4,16 +4,23 @@
  * @author wa-plugins.ru <support@wa-plugins.ru>
  * @link http://wa-plugins.ru/
  */
-class shopMessageboxPluginBackendSaveController extends waJsonController {
+class shopMessageboxPluginBackendSaveController extends waJsonController
+{
 
-    public function execute() {
+    public function execute()
+    {
         try {
             $messagebox = waRequest::post('messagebox');
             if (!$messagebox || !is_array($messagebox)) {
                 throw new Exception('Ошибка передачи данных');
             }
-
+            if (!isset($messagebox['params'])) {
+                $messagebox['params'] = array();
+            }
             $messagebox['params'] = json_encode($messagebox['params']);
+            if (!isset($messagebox['categories'])) {
+                $messagebox['categories'] = array();
+            }
             $messagebox['categories'] = json_encode($messagebox['categories']);
             $model = new shopMessageboxPluginModel();
 

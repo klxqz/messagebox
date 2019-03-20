@@ -1,6 +1,7 @@
 <?php
 
-class shopMessageboxPlugin extends shopPlugin {
+class shopMessageboxPlugin extends shopPlugin
+{
 
     protected static $plugin_id = array('shop', 'messagebox');
     protected static $params = array(
@@ -16,7 +17,8 @@ class shopMessageboxPlugin extends shopPlugin {
         'autoResize' => array('name' => 'autoResize', 'title' => 'Авто изменение размера', 'default' => true),
     );
 
-    public static function display($messagebox_id) {
+    public static function display($messagebox_id)
+    {
         $model = new shopMessageboxPluginModel();
         $app_settings_model = new waAppSettingsModel();
         if ($app_settings_model->get(self::$plugin_id, 'status') && ($messagebox = $model->getById($messagebox_id))) {
@@ -40,7 +42,8 @@ class shopMessageboxPlugin extends shopPlugin {
         }
     }
 
-    private function makeUrlPattern($url) {
+    private function makeUrlPattern($url)
+    {
         $url = preg_replace('/https?:\/\//', '', $url);
         $url = str_replace("*", ".*", $url);
         $url = str_replace("/", "\/", $url);
@@ -48,7 +51,8 @@ class shopMessageboxPlugin extends shopPlugin {
         return $url;
     }
 
-    public function getMessageboxByUrl($url) {
+    public function getMessageboxByUrl($url)
+    {
         $model = new shopMessageboxPluginModel();
         $messageboxes = $model->select('*')->where("`url` != ''")->fetchAll();
         foreach ($messageboxes as $messagebox) {
@@ -63,7 +67,8 @@ class shopMessageboxPlugin extends shopPlugin {
         return false;
     }
 
-    public function frontendHead() {
+    public function frontendHead()
+    {
         if ($this->getSettings('status')) {
             $url = wa()->getConfig()->getHostUrl() . wa()->getConfig()->getRequestUrl(false, true);
             $messagebox = $this->getMessageboxByUrl($url);
@@ -76,7 +81,8 @@ class shopMessageboxPlugin extends shopPlugin {
         }
     }
 
-    public function frontendProduct($product) {
+    public function frontendProduct($product)
+    {
         if ($this->getSettings('status')) {
             $html = '';
             $model = new shopMessageboxPluginModel();
@@ -93,7 +99,8 @@ class shopMessageboxPlugin extends shopPlugin {
         }
     }
 
-    public function frontendCategory($category) {
+    public function frontendCategory($category)
+    {
         if ($this->getSettings('status')) {
             $html = '';
             $model = new shopMessageboxPluginModel();
@@ -110,7 +117,8 @@ class shopMessageboxPlugin extends shopPlugin {
         }
     }
 
-    public static function getUserCategoryId($contact_id = null) {
+    public static function getUserCategoryId($contact_id = null)
+    {
         if ($contact_id === null) {
             $contact_id = wa()->getUser()->getId();
         }
@@ -125,7 +133,8 @@ class shopMessageboxPlugin extends shopPlugin {
         return $category_ids;
     }
 
-    private function messageboxDisplay($messagebox) {
+    private function messageboxDisplay($messagebox)
+    {
         if (!$messagebox) {
             return false;
         }
@@ -133,15 +142,15 @@ class shopMessageboxPlugin extends shopPlugin {
 
         $hash = md5(serialize($messagebox));
 
-        if (
-                ($messagebox['first_visit'] == 1 && waRequest::cookie('messagebox_' . $hash)) ||
-                ($messagebox['multiplicity'] && waRequest::cookie('messagebox_showcount_' . $hash) % $messagebox['multiplicity'] != 0)
-        ) {
-            return;
-        }
-
         if ($messagebox['multiplicity']) {
             wa()->getResponse()->setCookie('messagebox_showcount_' . $hash, waRequest::cookie('messagebox_showcount_' . $hash) + 1, time() + 30 * 86400, null, '', false, true);
+        }
+
+        if (
+            ($messagebox['first_visit'] == 1 && waRequest::cookie('messagebox_' . $hash)) ||
+            ($messagebox['multiplicity'] && waRequest::cookie('messagebox_showcount_' . $hash) % $messagebox['multiplicity'] != 1)
+        ) {
+            return;
         }
 
         if ($this->getSettings('include_fancybox')) {

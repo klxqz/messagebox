@@ -4,7 +4,7 @@ return array(
     'name' => 'Всплывающие окна',
     'description' => 'Произвольное количество всплывающих окон с сообщениями',
     'vendor' => '985310',
-    'version' => '2.3.0',
+    'version' => '2.3.1',
     'img' => 'img/messagebox.png',
     'shop_settings' => true,
     'frontend' => true,
